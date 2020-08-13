@@ -123,12 +123,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\阿尔法喵组-五子棋\five.cpp" />
     <ClCompile Include="ai2.cpp" />
+    <ClCompile Include="five.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\阿尔法喵组-五子棋\five.h" />
     <ClInclude Include="ai2.h" />
+    <ClInclude Include="five.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

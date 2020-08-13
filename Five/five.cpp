@@ -19,18 +19,11 @@ using namespace std;
 更改人：亢佳俊
 1.更改评分增加活二，眠二，活三，眠三评分
 */
-#define N 15
-#define attack 1 //攻守参数，当attack增大，策略趋近于进攻，反之，趋近于防守。
-#define same_u_i SameorNot(row + dx[u] * i, col + dy[u] * i, p[row][col])//u方向i距离的点是否同色
-#define OutOrNotEmpty (!InBoardorNot(row + dx[u] * i, col + dy[u] * i) || p[row + dx[u] * i][col + dy[u] * i] != 0) //出了棋盘或者非空格点
 
-int p[N + 2][N + 2]; //0空1黑2白  1● 2○ -1▲ -2△
-int s = 0, ais = 1, s0;//s是轮到谁下,s=1,2，s=1是ai下，s=2是玩家，s=s0是黑方下，否则是白方下
 bool is_end = false;
 int playoo = 1;
-int dx[8] = { 1, 1, 0, -1, -1, -1, 0, 1 }; //flat技术
-int dy[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };//（dx,dy）是8个方向向量
-int manu[2][300], manukey = 0;//棋谱
+int manu[2][300];
+
 
 int PrintChessboard(int i, int j)//打印棋盘
 {
@@ -296,6 +289,17 @@ int FreeOnePieces(int row, int col)//落子成活1的数量
 	return flag;
 }
 
+bool overline(int row, int col)//长连禁手
+{
+	for (int u = 0; u < 4; u++)if (num(row, col, u) + num(row, col, u + 4) > 4)return true;
+	return false;
+}
+
+bool ban(int row, int col)//判断落子后是否成禁手
+{
+	if (SameorNot(row, col, 2))return false;//白方无禁手
+	return FreeThreePieces(row, col) > 1 || overline(row, col) || FreeFourPieces(row, col) + FourPiecesNotFree(row, col) > 1;
+}
 
 bool GameOverorNot(int row, int col)//(row,col)处落子之后是否游戏结束
 {
@@ -305,6 +309,7 @@ bool GameOverorNot(int row, int col)//(row,col)处落子之后是否游戏结束
 			is_end = true;
 	}
 	if (is_end)return true;
+	is_end = ban(row, col);
 	return is_end;
 }
 
@@ -706,17 +711,6 @@ void change()
 
 
 }
-int main()
-{
-	Initialize();
-	GeginRule();
-	while (!is_end)
-	{
-		if (s == ais)MinimaxAlgorithmLevel1();
-		else player_ai2();
-		s = 3 - s;//换下棋方
-	}
-	return 0;
-}
+
 
 

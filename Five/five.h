@@ -1,6 +1,20 @@
-#pragma once
-#include"five.h"
-#include""
+#include"ai2.h"
+
+#ifndef _FIVE_H
+#define _FIVE_H
+
+//#define N 15
+#define attack 1 //攻守参数，当attack增大，策略趋近于进攻，反之，趋近于防守。
+#define same_u_i SameorNot(row + dx[u] * i, col + dy[u] * i, p[row][col])//u方向i距离的点是否同色
+#define OutOrNotEmpty (!InBoardorNot(row + dx[u] * i, col + dy[u] * i) || p[row + dx[u] * i][col + dy[u] * i] != 0) //出了棋盘或者非空格点
+
+extern int p[N + 2][N + 2]; //0空1黑2白  1● 2○ -1▲ -2△
+extern bool is_end;
+extern int playoo;
+extern int dx[]; //flat技术
+extern int dy[];//（dx,dy）是8个方向向量
+extern int manu[2][300];
+extern int manukey;//棋谱
 
 
 int PrintChessboard(int i, int j);//打印棋盘
@@ -22,7 +36,7 @@ int OnetoThreePieces(int row, int col);//成3点的数量
 bool GameOverorNot(int row, int col);//(row,col)处落子之后是否游戏结束
 void Play(int row, int col);//落下一子
 bool MoveinChessorNot(int row, int col);//能否落子
-int point(int row, int col,int play);//非负分值
+int point(int row, int col, int play);//非负分值
 int MinimaxAlgorithmLevel5(int p4);
 int MinimaxAlgorithmLevel4(int p3);
 int MinimaxAlgorithmLevel3(int p2);
@@ -37,3 +51,6 @@ int BeginAI3(int p2);// 开始环节AI第三层下棋
 void change();//交换黑白棋子
 void player_ai2();//ai2下棋
 void Change_pieces();//交换棋子
+
+#endif // !_FIVE_H
+

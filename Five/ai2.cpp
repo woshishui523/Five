@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include<string>
 #include<windows.h>
-#define N 15
-#define samep same(row + dx[u] * i, col + dy[u] * i, p[row][col])
-#define off if(!inboard(row + dx[u] * i, col + dy[u] * i) || p[row + dx[u] * i][col + dy[u] * i] != 0)continue;
+#include"ai2.h"
 
 int p[N + 2][N + 2]; //0空1黑2白  1●2○ -1▲-2△
-int s = 0, ais = 1, s0;//s是轮到谁下,s=1,2，s=1是ai下，s=2是玩家，s=s0是黑方下，否则是白方下
-bool is_end = false;
+int s = 0, ais = 1, s0;
 int dx[8] = { 1, 1, 0, -1, -1, -1, 0, 1 }; //flat技术
+bool is_en = true;
 int dy[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };//（dx,dy）是8个方向向量
-int manu[2][300], manukey = 0;
+int  manukey = 0;
+
 
 int out(int i, int j)
 {
@@ -163,9 +162,9 @@ int live3(int row, int col)//活3的数量
 
 bool end_(int row, int col)//(row,col)处落子之后是否游戏结束
 {
-	for (int u = 0; u < 4; u++)if (num(row, col, u) + num(row, col, u + 4) >= 4)is_end = true;
-	if (is_end)return true;
-	return is_end;
+	for (int u = 0; u < 4; u++)if (num(row, col, u) + num(row, col, u + 4) >= 4)is_en = true;
+	if (is_en)return true;
+	return is_en;
 }
 
 void go(int row, int col)//落下一子
@@ -185,7 +184,6 @@ void go(int row, int col)//落下一子
 		else printf("玩家胜");
 		Sleep(10000);
 	}
-	manu[0][manukey] = row, manu[1][manukey++] = col;
 }
 
 bool ok(int row, int col)//能否落子
@@ -197,7 +195,7 @@ int point(int row, int col)//非负分值
 {
 	if (end_(row, col))
 	{
-		is_end = false;
+		is_en = false;
 		return 10000;
 	}
 	int ret = live4(row, col) * 1000 + (chong4(row, col) + live3(row, col)) * 100, u;
@@ -282,36 +280,6 @@ void AI()
 	return go(keyi, keyj);
 }
 
-void out_manual()
-{
-	char alpha = 'A';
-	int i;
-	printf("\n  黑方落子位置: ");
-	for (i = 0; i < manukey; i += 2)printf("  %c%d", alpha + manu[1][i] - 1, manu[0][i]);
-	printf("\n  白方落子位置: ");
-	for (i = 1; i < manukey; i += 2)printf("  %c%d", alpha + manu[1][i] - 1, manu[0][i]);
-	Sleep(5000);
-}
 
-void player()
-{
-	DrawBoard();
-	printf("  轮到玩家下，请输入坐标(输入=0查看棋谱)： ");
-	char c = '\n';
-	int row = 0, col = 0;
-	while (c < '0')scanf("%c%d", &c, &row);
-	if (c == '=')
-	{
-		out_manual();
-		return player();
-	}
-	if (c < 'a')col = c - 'A' + 1;
-	else col = c - 'a' + 1;
-	if (!ok(row, col))
-	{
-		printf("此处不能下");
-		Sleep(1000);
-		return player();
-	}
-	go(row, col);
-}
+
+
