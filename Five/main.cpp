@@ -4,13 +4,20 @@
 
 int main()
 {
-	Initialize();
-	GeginRule();
-	while (!is_end)
+	int Time = 0;
+	bool coutinue = true;
+	while (coutinue)
 	{
-		if (s == ais)MinimaxAlgorithmLevel1();
-		else AI();
-		s = 3 - s;//换下棋方
+		Time++;
+		Initialize();
+		GeginRule();
+		while (!is_end)
+		{
+			if (s == ais)MinimaxAlgorithmLevel1();
+			else AI();
+			s = 3 - s;//换下棋方
+		}
+		coutinue = whether_end();
 	}
 	return 0;
 }

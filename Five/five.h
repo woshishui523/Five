@@ -8,6 +8,14 @@
 #define same_u_i SameorNot(row + dx[u] * i, col + dy[u] * i, p[row][col])//u方向i距离的点是否同色
 #define OutOrNotEmpty (!InBoardorNot(row + dx[u] * i, col + dy[u] * i) || p[row + dx[u] * i][col + dy[u] * i] != 0) //出了棋盘或者非空格点
 
+typedef struct
+{
+	int point[30] = { 0 };
+	int keyi[30] = { 0 };
+	int keyj[30] = { 0 };
+	int n;
+}FIVE,*Five;
+
 extern int p[N + 2][N + 2]; //0空1黑2白  1● 2○ -1▲ -2△
 extern bool is_end;
 extern int playoo;
@@ -42,6 +50,7 @@ int MinimaxAlgorithmLevel4(int p3);
 int MinimaxAlgorithmLevel3(int p2);
 int MinimaxAlgorithmLevel2(int p1);
 void MinimaxAlgorithmLevel1();
+void Findfivepieces();//寻找第五步
 void print_manual(); //输出棋谱
 void player();
 void GeginRule();//开始环节
@@ -51,6 +60,9 @@ int BeginAI3(int p2);// 开始环节AI第三层下棋
 void change();//交换黑白棋子
 void player_ai2();//ai2下棋
 void Change_pieces();//交换棋子
+void Get_Nbeats(int who);//五手N打
+bool whether_end();//是否进行下一局
+void changeFIVE(int i, int j, int point);//修改列表中的数值
 
 #endif // !_FIVE_H
 

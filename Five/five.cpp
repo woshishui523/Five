@@ -23,7 +23,8 @@ using namespace std;
 bool is_end = false;
 int playoo = 1;
 int manu[2][300];
-
+int FiveBeat;
+FIVE five;
 
 int PrintChessboard(int i, int j)//打印棋盘
 {
@@ -510,6 +511,66 @@ void MinimaxAlgorithmLevel1()
 	return Play(keyi, keyj);
 }
 
+void Findfivepieces(int n)
+{
+	five.n = n;
+	DrawInterface();
+	cout << "  正在寻找第五步，请稍候： ";
+	if (p[8][8] == 0)return Play(8, 8);  //首先下在天元
+	int i, j;
+	int keyp = -100000, keyi, keyj, tempp, temp;
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			if (!MoveinChessorNot(i, j))//判断是否有棋子
+				continue;
+			p[i][j] = s0;
+			tempp = point(i, j); //计算这个点的分数
+			temp = tempp;
+			if (tempp == 0)
+			{
+				p[i][j] = 0;
+				continue;
+			}//高效剪枝，避开了无效点
+			if (tempp == 10000)return Play(i, j);
+			tempp = BeginAI2();  //获得第二层最小和第三层最大的混合评价参数
+			p[i][j] = 0;
+			if (tempp + temp * attack > keyp)keyp = tempp + temp * attack, keyi = i, keyj = j;//第一层取极大
+					
+		}
+	}
+	return Play(keyi, keyj);
+}
+
+void changeFIVE(int i,int j,int point)
+{
+	bool ok = true;
+	int begini, beginj, mid;
+	if(point>five.point[1])
+	{ }
+	do
+	{
+		for (begini = 1; begini < five.n; begini++)
+		{
+			for (beginj = begini; beginj < five.n; beginj++)
+			{
+				if (five.point[beginj] > five.point[beginj + 1])
+				{
+					mid = five.point[beginj];
+					five.point[beginj] = five.point[beginj+1];
+					five.point[beginj + 1] = mid;
+					ok = false;
+				}
+			}
+		}
+	} while (!ok);
+	
+
+
+}
+
+
 void print_manual() //输出棋谱
 {
 	char alpha = 'A';
@@ -675,8 +736,9 @@ void BeginAI()
 void GeginRule()/*开始环节（指定开局黑方第一子为天元，
   白方第一子和黑方第二子为天元周围5*5棋盘内）*/
 {
-	int mid;
-	for (int i = 1; i <= 3; i++)
+	int mid,who;
+	int i = 1;
+	for (i = 1; i <= 3; i++)
 	{
 		if (s == ais)BeginAI();
 		else player();
@@ -687,8 +749,17 @@ void GeginRule()/*开始环节（指定开局黑方第一子为天元，
 	if (mid == 1)
 	{
 		change();
-		s = 3 - s;
 	}
+	for (; i < 5; i++)
+	{
+		if (s == ais)MinimaxAlgorithmLevel1();
+		else player();
+		s = 3 - s;//换下棋方
+	}
+	if (s == ais)who = 0;
+	else who = 1;
+	Get_Nbeats(who);
+
 }
 
 void change()
@@ -712,5 +783,28 @@ void change()
 
 }
 
+void Get_Nbeats(int who)
+{
+	cout << "五手N打棋子数为" << endl;
+	if (who == 0)//如果是我方选择
+	{
+		cout << "3";
 
+
+	}
+	if (who == 1)
+	{
+		cin >> FiveBeat;
+	}
+
+
+}
+
+bool whether_end()
+{
+	bool coutinue;
+	cout << "是否进行下一局" << "0结束，1进行下一局" << endl;
+	cin >> coutinue;
+	return coutinue;
+}
 
