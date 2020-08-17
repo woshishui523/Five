@@ -126,10 +126,12 @@
     <ClCompile Include="ai2.cpp" />
     <ClCompile Include="five.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TreeConstruction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ai2.h" />
     <ClInclude Include="five.h" />
+    <ClInclude Include="TreeConstruction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

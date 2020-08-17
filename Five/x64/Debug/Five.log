@@ -1,2 +1,9 @@
 ﻿  five.cpp
+d:\github\five\five\five.cpp(573): warning C4101: “mid”: 未引用的局部变量
+d:\github\five\five\five.cpp(798): warning C4101: “keyi”: 未引用的局部变量
+d:\github\five\five\five.cpp(798): warning C4101: “tempp”: 未引用的局部变量
+d:\github\five\five\five.cpp(798): warning C4101: “keyp”: 未引用的局部变量
+d:\github\five\five\five.cpp(798): warning C4101: “temp”: 未引用的局部变量
+d:\github\five\five\five.cpp(798): warning C4101: “keyj”: 未引用的局部变量
+d:\github\five\five\five.cpp(868): warning C4715: “Get_Nbeats”: 不是所有的控件路径都返回值
   Five.vcxproj -> D:\GitHub\Five\x64\Debug\Five.exe

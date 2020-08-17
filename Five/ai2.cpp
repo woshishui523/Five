@@ -6,7 +6,7 @@
 int p[N + 2][N + 2]; //0空1黑2白  1●2○ -1▲-2△
 int s = 0, ais = 1, s0;
 int dx[8] = { 1, 1, 0, -1, -1, -1, 0, 1 }; //flat技术
-bool is_en = true;
+bool is_en = false;
 int dy[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };//（dx,dy）是8个方向向量
 int  manukey = 0;
 

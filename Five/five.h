@@ -10,7 +10,7 @@
 
 typedef struct
 {
-	int point[30] = { 0 };
+	int point[30] = { -10000, };
 	int keyi[30] = { 0 };
 	int keyj[30] = { 0 };
 	int n;
@@ -44,13 +44,13 @@ int OnetoThreePieces(int row, int col);//成3点的数量
 bool GameOverorNot(int row, int col);//(row,col)处落子之后是否游戏结束
 void Play(int row, int col);//落下一子
 bool MoveinChessorNot(int row, int col);//能否落子
-int point(int row, int col, int play);//非负分值
+int point(int row, int col, int play);//非负分值,1为复杂计算，2为简单计算
 int MinimaxAlgorithmLevel5(int p4);
 int MinimaxAlgorithmLevel4(int p3);
 int MinimaxAlgorithmLevel3(int p2);
 int MinimaxAlgorithmLevel2(int p1);
 void MinimaxAlgorithmLevel1();
-void Findfivepieces();//寻找第五步
+void Findfivepieces(int n);//寻找第五步
 void print_manual(); //输出棋谱
 void player();
 void GeginRule();//开始环节
@@ -60,9 +60,13 @@ int BeginAI3(int p2);// 开始环节AI第三层下棋
 void change();//交换黑白棋子
 void player_ai2();//ai2下棋
 void Change_pieces();//交换棋子
-void Get_Nbeats(int who);//五手N打
+int Get_Nbeats(int who);//五手N打
 bool whether_end();//是否进行下一局
 void changeFIVE(int i, int j, int point);//修改列表中的数值
+void outputFive();//输出选中的五个棋子
+void ChooseFivepieces1();//选择第五步的棋子(我方黑棋)
+void ChooseFivepieces2(int n);//对面黑棋的时候
+void change_two(int &i, int &j);//交换两个整数
 
 #endif // !_FIVE_H
 

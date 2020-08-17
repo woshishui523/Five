@@ -350,7 +350,7 @@ int point(int row, int col,int play)//非负分值
 	}
 	int ret, u;
 	if(play==1)
-		ret = FreeFourPieces(row, col) * 50000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 400 + 20 * (SleepThreePieces(row, col) + FreeTwoPieces(row, col)) + SleepTwoPieces(row, col) + FreeOnePieces(row, col);
+		ret = FreeFourPieces(row, col) * 50000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 400 + 20 * (SleepThreePieces(row, col) + FreeTwoPieces(row, col));
 	if (play == 2)
 		ret = FreeFourPieces(row, col) * 50000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 400;
 	//给选定点评分 活4*50000+（冲4+活3）*400+ (眠3+活2)*20+ 眠2+ 活1
@@ -376,10 +376,10 @@ int MinimaxAlgorithmLevel5(int p4)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 10000)
+			if (tempp == 1000000)
 			{
 				p[i][j] = 0;
-				return 10000;
+				return 1000000;
 			}
 			p[i][j] = 0;
 			if (tempp - p4 > keyp)keyp = tempp - p4 ;//第三层取极大
@@ -406,13 +406,13 @@ int MinimaxAlgorithmLevel4(int p3)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 10000)
+			if (tempp == 1000000)
 			{
 				p[i][j] = 0;
-				return 10000;
+				return -1000000;
 			}
 			p[i][j] = 0;
-			tempp = MinimaxAlgorithmLevel5(tempp);
+			//tempp = minimaxalgorithmlevel5(tempp);
 			if (tempp + p3 > keyp)keyp = tempp + p3;//第三层取极大
 			//保留第二层极小值的情况下，加入第三层极大值的影响。
 		}
@@ -439,10 +439,10 @@ int MinimaxAlgorithmLevel3(int p2)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 10000)
+			if (tempp == 1000000)
 			{
 				p[i][j] = 0;
-				return 10000;
+				return 1000000;
 			}
 			p[i][j] = 0;
 			tempp = MinimaxAlgorithmLevel4(tempp);
@@ -468,10 +468,10 @@ int MinimaxAlgorithmLevel2(int p1)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 10000)
+			if (tempp == 1000000)
 			{
 				p[i][j] = 0;
-				return -10000;
+				return -1000000;
 			}
 			tempp = MinimaxAlgorithmLevel3(tempp);
 			p[i][j] = 0;
@@ -502,7 +502,7 @@ void MinimaxAlgorithmLevel1()
 				p[i][j] = 0;
 				continue;
 			}//高效剪枝，避开了无效点
-			if (tempp == 10000)return Play(i, j);
+			if (tempp == 1000000)return Play(i, j);
 			tempp = MinimaxAlgorithmLevel2(tempp);  //获得第二层最小和第三层最大的混合评价参数
 			p[i][j] = 0;
 			if (tempp > keyp)keyp = tempp, keyi = i, keyj = j;//第一层取极大
@@ -533,40 +533,66 @@ void Findfivepieces(int n)
 				p[i][j] = 0;
 				continue;
 			}//高效剪枝，避开了无效点
-			if (tempp == 10000)return Play(i, j);
-			tempp = BeginAI2();  //获得第二层最小和第三层最大的混合评价参数
+			if (tempp == 1000000)return Play(i, j);
+			tempp = AI2();  //获得第二层最小和第三层最大的混合评价参数
 			p[i][j] = 0;
-			if (tempp + temp * attack > keyp)keyp = tempp + temp * attack, keyi = i, keyj = j;//第一层取极大
-					
+			if (tempp + temp * attack > five.point[1])
+			{
+				keyp = tempp + temp * attack, keyi = i, keyj = j;//第一层取极大
+				changeFIVE(keyi, keyj, keyp);
+			}
 		}
 	}
-	return Play(keyi, keyj);
+	outputFive();
+}
+
+void outputFive()
+{
+	char alpha = 'A';
+	cout << "可选择的棋子为：" << endl;
+
+	for (int i = 1; i <= five.n; i++)
+	{
+		cout << (char)(alpha + five.keyj[i] - 1) << (char)(five.keyi[i] + 48) << endl;
+
+	}
+
+}
+
+void change_two(int &i, int &j)
+{
+	int mid;
+	mid = i;
+	i = j;
+	j = mid;
 }
 
 void changeFIVE(int i,int j,int point)
 {
 	bool ok = true;
 	int begini, beginj, mid;
-	if(point>five.point[1])
-	{ }
-	do
+	if(point>=five.point[1])
 	{
+		five.point[1] = point;
+		five.keyi[1] = i;
+		five.keyj[1] = j;
 		for (begini = 1; begini < five.n; begini++)
 		{
 			for (beginj = begini; beginj < five.n; beginj++)
 			{
 				if (five.point[beginj] > five.point[beginj + 1])
 				{
-					mid = five.point[beginj];
-					five.point[beginj] = five.point[beginj+1];
-					five.point[beginj + 1] = mid;
+					change_two(five.point[beginj], five.point[beginj + 1]);
+					change_two(five.keyi[beginj], five.keyi[beginj + 1]);
+					change_two(five.keyj[beginj], five.keyj[beginj + 1]);
 					ok = false;
 				}
 			}
+			if (ok == true)
+				break;
+			ok = true;
 		}
-	} while (!ok);
-	
-
+	}
 
 }
 
@@ -734,10 +760,14 @@ void BeginAI()
 }
 
 void GeginRule()/*开始环节（指定开局黑方第一子为天元，
-  白方第一子和黑方第二子为天元周围5*5棋盘内）*/
+  白方第一子和黑方第二子为天元周围5*5棋盘内,执行五手N打）*/
 {
-	int mid,who;
+	int mid,who,FiveBeat;
 	int i = 1;
+	memset(five.point, -10000, sizeof(five.point));
+	if (s == ais)who = 0;
+	else who = 1;
+	FiveBeat = Get_Nbeats(who);
 	for (i = 1; i <= 3; i++)
 	{
 		if (s == ais)BeginAI();
@@ -756,10 +786,44 @@ void GeginRule()/*开始环节（指定开局黑方第一子为天元，
 		else player();
 		s = 3 - s;//换下棋方
 	}
-	if (s == ais)who = 0;
-	else who = 1;
-	Get_Nbeats(who);
+	if (s == ais)Findfivepieces(FiveBeat),ChooseFivepieces1();
+	else ChooseFivepieces2(FiveBeat);
 
+	s = 3 - s;
+
+}
+
+void ChooseFivepieces2(int n)
+{
+	int tempp, temp, keyp, keyi, keyj, score;
+	cout << "对方提供的位置为：";
+	char c = '\n';
+	int row = 0, col = 0;
+	for (int p = 1; p<= n; p++)
+	{
+		cin.ignore(100);
+		cout << "第" << p << "个棋子为：";
+		while (c < '0')cin >> c >> row;
+		if (c < 'a')col = c - 'A' + 1;  //区分大小写，计算列数
+		else col = c - 'a' + 1;
+		cout << endl;
+		score = point(row, col, 1);
+		changeFIVE(row, col, score);
+	}
+	Play(five.keyi[1], five.keyj[1]);
+
+
+}
+
+void ChooseFivepieces1()
+{
+	cout << "对方选择的棋子为：";
+	char c = '\n';
+	int row = 0, col = 0;
+	while (c < '0')cin >> c >> row;
+	if (c < 'a')col = c - 'A' + 1;  //区分大小写，计算列数
+	else col = c - 'a' + 1;
+	Play(row, col);
 }
 
 void change()
@@ -779,22 +843,25 @@ void change()
 
 		}
 	}
-
-
+	s = 3 - s;
+	
 }
 
-void Get_Nbeats(int who)
+int Get_Nbeats(int who)
 {
 	cout << "五手N打棋子数为" << endl;
 	if (who == 0)//如果是我方选择
 	{
 		cout << "3";
-
+		getchar();
+		getchar();
+		return 3;
 
 	}
-	if (who == 1)
+	if (who == 1)//如果是对方选择
 	{
 		cin >> FiveBeat;
+		return FiveBeat;
 	}
 
 
