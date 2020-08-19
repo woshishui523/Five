@@ -14,9 +14,19 @@ typedef struct
 	int keyi[30] = { 0 };
 	int keyj[30] = { 0 };
 	int n;
+}FIVE,*Five;
+
+typedef struct
+{
+	int point[30] = { -10000, };
+	int keyi[30][30] = { 0 };
+	int keyj[30][30] = { 0 };
+	int n,nb;//n 为所在层数的元素个数，nb是第一层元素个数
 	int i[30] = { 0 };
 	int j[30] = { 0 };
-}FIVE,*Five;
+
+
+}MATRIX,*Matrix;
 
 
 
@@ -84,7 +94,6 @@ void BeginAI();// 开始环节AI第一层下棋
 int BeginAI2();// 开始环节AI第二层下棋
 int BeginAI3(int p2);// 开始环节AI第三层下棋
 void change();//交换黑白棋子
-void player_ai2();//ai2下棋
 void Change_pieces();//交换棋子
 
 //五手N打函数
@@ -106,10 +115,13 @@ void new_FROM_old(TRAVERSE trav);//新的变回老的
 //广度搜索
 void Findpieces1(int n);//寻找棋子的第一层，n为寻找几个
 int Findpieces2(int p1);//寻找棋子的第二层
-void Get_point(int i, int j, int n);//计算各层分数，并赋值给队列
+void Get_point(int n,int j);//计算各层分数，并赋值给队列,n为个数，j为第几个
 void change_list();//递减改变队列
 void FIGHTER();//计算得出棋子
-void init_LIST();//初始化队列
-
+void init_LIST();//初始化队列i，j
+bool Judge_oddoroven(int n);//判断奇偶函数
+void init_LIST(int n);//初始化队列分数
+void changeMATRIX(int i, int j, int point);//改变matrix的排序
+void Get_finalpoint(int& keyi, int&keyj, int&keypp, bool minormax);//计算得分函数
 #endif // !_FIVE_H
 

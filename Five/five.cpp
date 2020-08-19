@@ -24,7 +24,9 @@ bool is_end = false;
 int playoo = 1;
 int manu[2][300];
 int FiveBeat;
+int ban_level;
 FIVE five;
+MATRIX matrix;
 TRAVERSE tra;
 
 int PrintChessboard(int i, int j)//打印棋盘
@@ -168,6 +170,7 @@ int SleepThreePieces(int row, int col)//落子成眠3的数量
 
 	return OnetoFourPieces(row, col) - FreeThreePieces(row, col)*2;
 }
+
 int FreeThreePieces(int row, int col)//落子成活3的数量
 {
 	int key = p[row][col], sum = 0, i, u, flag = 2;
@@ -332,6 +335,7 @@ void Play(int row, int col)//落下一子
 	{
 		if (s == ais) cout << "我方胜";
 		else cout << "对方胜";
+		is_end = true;
 		Sleep(10000);
 	}
 	manu[0][manukey] = row, manu[1][manukey++] = col;  //储存完后加一
@@ -537,30 +541,37 @@ void FIGHTER()
 {
 	bool ok = true;
 	int begini, beginj;
-	int n = 5;
+	int n = 10,pp;
 	DrawInterface();
+	init_LIST(n);
 	cout << "  轮到我方下，请稍候： ";
 	if (p[8][8] == 0)return Play(8, 8);  //首先下在天元
 	Findpieces1(n);
 	init_LIST();
-	for (; five.n > 1;)
+	for (; matrix.n > 1;)
 	{
 		for (int i = 1; i <= n; i++)
 		{
-			Get_point(five.keyi[i], five.keyj[i], i);
+			ban_level = 12 - matrix.n;
+			Get_point(matrix.nb, i);
 			
 		}
-		for (begini = 1; begini < five.n; begini++)
+		for (begini = 1; begini < matrix.n; begini++)
 		{
-			for (beginj = begini; beginj < five.n; beginj++)
+			for (beginj = begini; beginj < matrix.n; beginj++)
 			{
-				if (five.point[beginj] > five.point[beginj + 1])
+				if (matrix.point[beginj] > matrix.point[beginj + 1])
 				{
-					change_two(five.point[beginj], five.point[beginj + 1]);
-					change_two(five.keyi[beginj], five.keyi[beginj + 1]);
-					change_two(five.keyj[beginj], five.keyj[beginj + 1]);
-					change_two(five.i[beginj], five.i[beginj + 1]);
-					change_two(five.j[beginj], five.j[beginj + 1]);
+					change_two(matrix.point[beginj], matrix.point[beginj + 1]);
+					for (int num = matrix.nb; num >= matrix.n; num--)
+					{
+						pp = num - matrix.n + 1;
+						change_two(matrix.keyi[pp][beginj], matrix.keyi[pp][beginj + 1]);
+						change_two(matrix.keyj[pp][beginj], matrix.keyj[pp][beginj + 1]);
+					}
+					
+					change_two(matrix.i[beginj], matrix.i[beginj + 1]);
+					change_two(matrix.j[beginj], matrix.j[beginj + 1]);
 					ok = false;
 				}
 			}
@@ -571,16 +582,34 @@ void FIGHTER()
 		change_list();
 	}
 
-	return Play(five.i[1], five.j[1]);
+	return Play(matrix.i[1], matrix.j[1]);
+
+}
+
+void init_LIST(int n)
+{
+	for (int i = 1; i <= n; i++)
+	{
+		matrix.point[i] = -10000;
+		matrix.i[i] = 0;
+		matrix.j[i] = 0;
+		for (int j = 1; j <= n; j++)
+		{
+			matrix.keyi[i][j] = 0;
+			matrix.keyj[i][j] = 0;
+		}
+	}
+
+
 
 }
 
 void init_LIST()
 {
-	for (int i = 1; i <= five.n; i++)
+	for (int i = 1; i <= matrix.n; i++)
 	{
-		five.i[i] = five.keyi[i];
-		five.j[i] = five.keyj[i];
+		matrix.i[i] = matrix.keyi[1][i];
+		matrix.j[i] = matrix.keyj[1][i];
 
 	}
 
@@ -588,32 +617,78 @@ void init_LIST()
 
 void change_list()
 {
-	for (int i = 1; i < five.n; i++)
+	int n = matrix.nb - matrix.n + 2;
+	for (int i = 1; i < matrix.n; i++)
 	{
 
-		five.point[i] = five.point[i + 1];
-		five.keyi[i] = five.keyi[i + 1];
-		five.keyj[i] = five.keyj[i + 1];
-		five.i[i] = five.keyi[i + 1];
-		five.j[i] = five.keyj[i + 1];
-
+		matrix.point[i] = matrix.point[i + 1];
+		for (int j = 1; j <= n; j++)
+		{
+			matrix.keyi[j][i] = matrix.keyi[j][i + 1];
+			matrix.keyj[j][i] = matrix.keyj[j][i + 1];
+		}
+		matrix.i[i] = matrix.i[i + 1];
+		matrix.j[i] = matrix.j[i + 1];
 	}
-	five.n--;
+	matrix.n--;
+}
+
+void Get_point(int n,int j)//得到所在行的一个棋子
+{
+	int tool = 0;
+	int i, keyi, keyj, keyp, n_now = matrix.nb - n + 1;
+	bool oddOReven;
+	TRAVERSE trav;
+	
+	if (ban_level == n_now)tool = 2;
+	else tool = 0;
+	if (tool == 0)//改变队列，和搜索表已经棋盘
+	{
+		old_FROM_new(trav);
+		upgrate_traverse(matrix.keyi[n_now][j], matrix.keyj[n_now][j]);
+		if (Judge_oddoroven(n_now))
+			p[matrix.keyi[n_now][j]][matrix.keyj[n_now][j]] = s0;
+		if (!Judge_oddoroven(n_now))
+			p[matrix.keyi[n_now][j]][matrix.keyj[n_now][j]] = 3 - s0;
+		Get_point(n - 1, j);
+		p[matrix.keyi[n_now][j]][matrix.keyj[n_now][j]] = 0;
+		new_FROM_old(trav);
+	}
+	
+
+	if (tool == 2)
+	{
+		oddOReven = Judge_oddoroven(n_now);
+		Get_finalpoint(keyi, keyj, keyp, oddOReven);
+		matrix.keyi[n_now][j] = keyi; 
+		matrix.keyj[n_now][j] = keyj;
+		matrix.point[j] += keyp;
+	}
+	
 
 }
 
-void Get_point(int i,int j,int n)
+bool Judge_oddoroven(int n)
 {
-	int temp, tempp, keyp = 1000000, keyi, keyj;
-	TRAVERSE trav;
-	old_FROM_new(trav);
-	upgrate_traverse(i, j);
+	if (n % 2 == 0)return 0;//0为偶数
+	else return 1;
+
+}
+
+
+
+void Get_finalpoint(int& keyi,int&keyj,int&keypp,bool minormax)
+{
+	int temp, tempp, keyp, i, j;
+	if (minormax == 0)keyp = 1000000;
+	else keyp = -1000000;
 	for (i = 1; i <= N; i++)
 	{
 		for (j = tra.i_beginj[i]; j <= tra.i_endj[i]; j++)
 		{
 			if (!MoveinChessorNot(i, j))continue;
-			p[i][j] = 3 - s0;  //转换为对面棋子
+			if (minormax == 0)p[i][j] = 3 - s0;  //转换为对面棋子
+			else p[i][j] = s0;
 			tempp = point(i, j, playoo);
 			if (tempp == 0)
 			{
@@ -627,22 +702,18 @@ void Get_point(int i,int j,int n)
 				break;
 			}
 			p[i][j] = 0;
-			if (tempp < keyp)keyp = tempp, keyi = i, keyj = j;//第二层取极小
+			if (-tempp < keyp&&minormax == 0)keyp = -tempp, keyi = i, keyj = j;//第二层取极小
+			if (tempp > keyp&&minormax == 1)keyp = tempp, keyi = i, keyj = j;//第二层取极大
 		}
 	}
-
-	five.keyi[n] = keyi;
-	five.keyj[n] = keyj;
-	five.point[n] += keyp;
-	new_FROM_old(trav);
+	keypp = keyp;
 
 }
 
-
-
 void Findpieces1(int n)
 {
-	five.n = n;
+	matrix.n = n;
+	matrix.nb = n;
 	int i, j;
 	int keyp = -100000, keyi, keyj, tempp, temp;
 	TRAVERSE trav;
@@ -654,19 +725,21 @@ void Findpieces1(int n)
 				continue;
 			p[i][j] = s0;
 			tempp = point(i, j, 1); //计算这个点的分数
-			temp = tempp;
 			if (tempp == 0)
 			{
 				p[i][j] = 0;
 				continue;
 			}//高效剪枝，避开了无效点
 			if (tempp == 1000000)return Play(i, j);
+			old_FROM_new(trav);
+			upgrate_traverse(i, j);
 			tempp = Findpieces2(tempp);
+			new_FROM_old(trav);
 			p[i][j] = 0;
-			if (tempp + temp * attack > five.point[1])
+			if (tempp > matrix.point[1])
 			{
-				keyp = tempp + temp * attack, keyi = i, keyj = j;//第一层取极大
-				changeFIVE(keyi, keyj, keyp);
+				keyp = tempp , keyi = i, keyj = j;//第一层取极大
+				changeMATRIX(keyi, keyj, keyp);
 			}
 		}
 	}
@@ -674,7 +747,7 @@ void Findpieces1(int n)
 
 int Findpieces2(int p1)
 {
-	int keyp = 100000, tempp, i, j;
+	int keyp = 100000, tempp, i, j, keyi, keyj;
 	TRAVERSE trav;
 	for (i = 1; i <= N; i++)
 	{
@@ -695,16 +768,14 @@ int Findpieces2(int p1)
 			}
 
 			p[i][j] = 0;
-			if (tempp + p1 < keyp)keyp = tempp + p1;//第二层取极小
+			if (tempp + p1 < keyp)keyp = tempp + p1, keyi = i, keyj = j;//第二层取极小
 		}
 	}
+
 	return keyp;
 
 
 }
-
-
-
 
 void Findfivepieces(int n)
 {
@@ -762,6 +833,41 @@ void change_two(int &i, int &j)
 	j = mid;
 }
 
+void changeMATRIX(int i, int j, int point)
+{
+	bool ok = true;
+	int n = matrix.nb - matrix.n + 1;
+	int begini, beginj, mid;
+	if (point >= matrix.point[1])
+	{
+		matrix.point[1] = point;
+		matrix.keyi[n][1] = i;
+		matrix.keyj[n][1] = j;
+		for (begini = 1; begini < matrix.n; begini++)
+		{
+			for (beginj = begini; beginj < matrix.n; beginj++)
+			{
+				if (matrix.point[beginj] > matrix.point[beginj + 1])
+				{
+					change_two(matrix.point[beginj], matrix.point[beginj + 1]);
+					for (int j = 1; j <= n; j++)
+					{
+						change_two(matrix.keyi[j][beginj], matrix.keyi[j][beginj + 1]);
+						change_two(matrix.keyj[j][beginj], matrix.keyj[j][beginj + 1]);
+					}
+					
+					ok = false;
+				}
+			}
+			if (ok == true)
+				break;
+			ok = true;
+		}
+	}
+
+
+}
+
 void changeFIVE(int i,int j,int point)
 {
 	bool ok = true;
@@ -790,7 +896,6 @@ void changeFIVE(int i,int j,int point)
 	}
 
 }
-
 
 void print_manual() //输出棋谱
 {
@@ -850,17 +955,6 @@ void Change_pieces()
 
 }
 
-void player_ai2()
-{
-	DrawInterface();
-	cout << "  轮到对方下，请输入坐标(输入=0查看棋谱)： ";
-	DrawInterface();
-	playoo = 2;
-	MinimaxAlgorithmLevel1();
-	DrawInterface();
-	playoo = 1;
-
-}
 int BeginAI3(int p2)
 {
 	int keyp = -100000, tempp;
@@ -891,6 +985,7 @@ int BeginAI3(int p2)
 
 
 }
+
 int BeginAI2()
 {
 	int keyp = 100000, tempp;
@@ -920,6 +1015,7 @@ int BeginAI2()
 
 
 }
+
 void BeginAI()
 {
 	DrawInterface();
@@ -974,10 +1070,11 @@ void GeginRule()/*开始环节（指定开局黑方第一子为天元，
 	if (mid == 1)
 	{
 		change();
+
 	}
 	for (; i < 5; i++)
 	{
-		if (s == ais)MinimaxAlgorithmLevel1();
+		if (s == ais)FIGHTER();
 		else player();
 		s = 3 - s;//换下棋方
 	}
@@ -990,15 +1087,14 @@ void GeginRule()/*开始环节（指定开局黑方第一子为天元，
 
 void ChooseFivepieces2(int n)
 {
-	int tempp, temp, keyp, keyi, keyj, score;
+	int tempp, temp, keyp, keyj, score;
 	cout << "对方提供的位置为：";
 	char c = '\n';
 	int row = 0, col = 0;
 	for (int p = 1; p<= n; p++)
 	{
-		cin.ignore(100);
 		cout << "第" << p << "个棋子为：";
-		while (c < '0')cin >> c >> row;
+		cin >> c >> row;
 		if (c < 'a')col = c - 'A' + 1;  //区分大小写，计算列数
 		else col = c - 'a' + 1;
 		cout << endl;
@@ -1023,23 +1119,8 @@ void ChooseFivepieces1()
 
 void change()
 {
-	for (int i = 1; i <= N; i++)
-	{
-		for (int j = 1; j <= N; j++)
-		{
-			if (p[i][j] > 0)
-			{
-				p[i][j] = 3 - p[i][j];  //交换黑白棋子
-			}
-			if (p[i][j] < 0)
-			{
-				p[i][j] = -3 - p[i][j];
-			}
-
-		}
-	}
+	s0 = 3 - s0;
 	s = 3 - s;
-	
 }
 
 int Get_Nbeats(int who)
@@ -1096,9 +1177,9 @@ void upgrate_traverse(int i,int j)
 	a[10].x = i + 2, a[10].y = j + 2;
 	for (int i = 1; i <= 5; i++)
 	{
-		if (a[i].y < tra.i_beginj[a[i].x] && a[i].y >= 1)
+		if (a[i].y < tra.i_beginj[a[i].x] && a[i].y >= 1 && a[i].x <= 15 && a[i].x >= 1)
 			tra.i_beginj[a[i].x] = a[i].y;
-		if (a[i + 5].y > tra.i_endj[a[i + 5].x] && a[i + 5].y <= 15)
+		if (a[i + 5].y > tra.i_endj[a[i + 5].x] && a[i + 5].y <= 15 && a[i + 5].x <= 15 && a[i + 5].x >= 1)
 			tra.i_endj[a[i + 5].x] = a[i + 5].y;
 	}
 

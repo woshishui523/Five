@@ -11,6 +11,8 @@ int main()
 	bool coutinue = true;
 	while (coutinue)
 	{
+		system("cls");
+		is_end = false;
 		Time++;
 		init_traverse();
 		Initialize();
