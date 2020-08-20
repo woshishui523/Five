@@ -41,7 +41,7 @@ typedef struct
 {
 	int i_begini[16] = { 0 };
 	int i_beginj[16] = { 0 };
-	int i_endi[16] = { 0 };;
+	int i_endi[16] = { 0 };
 	int i_endj[16] = { 0 };
 }TRAVERSE,*Traverse;
 
@@ -80,6 +80,8 @@ bool GameOverorNot(int row, int col);//(row,col)处落子之后是否游戏结束
 void Play(int row, int col);//落下一子
 bool MoveinChessorNot(int row, int col);//能否落子
 int point(int row, int col, int play);//非负分值,1为复杂计算，2为简单计算
+
+//暂时未用到函数
 int MinimaxAlgorithmLevel5(int p4);
 int MinimaxAlgorithmLevel4(int p3);
 int MinimaxAlgorithmLevel3(int p2);
@@ -113,10 +115,11 @@ void old_FROM_new(TRAVERSE& trav);//老的赋值
 void new_FROM_old(TRAVERSE trav);//新的变回老的
 
 //广度搜索
-void Findpieces1(int n);//寻找棋子的第一层，n为寻找几个
+bool Findpieces1(int n);//寻找棋子的第一层，n为寻找几个
 int Findpieces2(int p1);//寻找棋子的第二层
+int Findpieces3(int p2);//寻找棋子的第三层
 void Get_point(int n,int j);//计算各层分数，并赋值给队列,n为个数，j为第几个
-void change_list();//递减改变队列
+void change_list(int t);//递减改变队列
 void FIGHTER();//计算得出棋子
 void init_LIST();//初始化队列i，j
 bool Judge_oddoroven(int n);//判断奇偶函数

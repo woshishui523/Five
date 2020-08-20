@@ -6,7 +6,7 @@
 int p[N + 2][N + 2]; //0空1黑2白  1●2○ -1▲-2△
 int s = 0, ais = 1, s0;
 int dx[8] = { 1, 1, 0, -1, -1, -1, 0, 1 }; //flat技术
-bool is_en = false;
+bool is_end = false;
 int dy[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };//（dx,dy）是8个方向向量
 int  manukey = 0;
 
@@ -162,9 +162,9 @@ int live3(int row, int col)//活3的数量
 
 bool end_(int row, int col)//(row,col)处落子之后是否游戏结束
 {
-	for (int u = 0; u < 4; u++)if (num(row, col, u) + num(row, col, u + 4) >= 4)is_en = true;
-	if (is_en)return true;
-	return is_en;
+	for (int u = 0; u < 4; u++)if (num(row, col, u) + num(row, col, u + 4) >= 4)is_end = true;
+	if (is_end)return true;
+	return is_end;
 }
 
 void go(int row, int col)//落下一子
@@ -195,7 +195,7 @@ int point(int row, int col)//非负分值
 {
 	if (end_(row, col))
 	{
-		is_en = false;
+		is_end = false;
 		return 10000;
 	}
 	int ret = live4(row, col) * 1000 + (chong4(row, col) + live3(row, col)) * 100, u;

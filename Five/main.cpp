@@ -20,7 +20,7 @@ int main()
 		while (!is_end)
 		{
 			if (s == ais) start = clock(), FIGHTER(), finsh = clock(), time += (finsh - start) / CLOCKS_PER_SEC;
-			else AI();
+			else AI();//如果想自己下换为 player（）函数
 			s = 3 - s;//换下棋方
 			cout << "现在时间为" << time << endl;
 		}

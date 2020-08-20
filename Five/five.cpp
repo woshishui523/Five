@@ -20,7 +20,6 @@ using namespace std;
 1.更改评分增加活二，眠二，活三，眠三评分
 */
 
-bool is_end = false;
 int playoo = 1;
 int manu[2][300];
 int FiveBeat;
@@ -313,7 +312,10 @@ bool GameOverorNot(int row, int col)//(row,col)处落子之后是否游戏结束
 		if (number(row, col, u) + number(row, col, u + 4) >= 4) //正反两个方向求和
 			is_end = true;
 	}
-	if (is_end)return true;
+	if (is_end)
+	{
+		return true;
+	}
 	is_end = ban(row, col);
 	return is_end;
 }
@@ -356,7 +358,7 @@ int point(int row, int col,int play)//非负分值
 	}
 	int ret, u;
 	if (play == 1)
-		ret = FreeFourPieces(row, col) * 50000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 400 + (SleepThreePieces(row, col) + FreeTwoPieces(row, col)) * 20 + (SleepTwoPieces(row, col) + FreeOnePieces(row, col));
+		ret = FreeFourPieces(row, col) * 1000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 100 + (SleepThreePieces(row, col) + FreeTwoPieces(row, col)) * 5 + (SleepTwoPieces(row, col) + FreeOnePieces(row, col));
 	if (play == 2)
 		ret = FreeFourPieces(row, col) * 50000 + (FourPiecesNotFree(row, col) + FreeThreePieces(row, col)) * 400;
 	//给选定点评分 活4*50000+（冲4+活3）*400+ (眠3+活2)*20+ 眠2+ 活1
@@ -541,45 +543,55 @@ void FIGHTER()
 {
 	bool ok = true;
 	int begini, beginj;
-	int n = 10,pp;
+	int n = 15,pp;
 	DrawInterface();
 	init_LIST(n);
 	cout << "  轮到我方下，请稍候： ";
 	if (p[8][8] == 0)return Play(8, 8);  //首先下在天元
-	Findpieces1(n);
+	if (Findpieces1(4)) return;
 	init_LIST();
-	for (; matrix.n > 1;)
+	for (; matrix.n > 1||n>1;)
 	{
-		for (int i = 1; i <= n; i++)
+		for (int i = 1; i <= matrix.n; i++)
 		{
-			ban_level = 12 - matrix.n;
+			ban_level = 17 - n;
 			Get_point(matrix.nb, i);
+			if (matrix.point[i] == 10000)
+			{
+				return Play(matrix.i[i], matrix.j[i]);
+			}
+			if (matrix.point[i] == -10000)
+			{
+				change_list(i);
+				i--;
+			}
 			
 		}
-		for (begini = 1; begini < matrix.n; begini++)
-		{
-			for (beginj = begini; beginj < matrix.n; beginj++)
-			{
-				if (matrix.point[beginj] > matrix.point[beginj + 1])
-				{
-					change_two(matrix.point[beginj], matrix.point[beginj + 1]);
-					for (int num = matrix.nb; num >= matrix.n; num--)
-					{
-						pp = num - matrix.n + 1;
-						change_two(matrix.keyi[pp][beginj], matrix.keyi[pp][beginj + 1]);
-						change_two(matrix.keyj[pp][beginj], matrix.keyj[pp][beginj + 1]);
-					}
-					
-					change_two(matrix.i[beginj], matrix.i[beginj + 1]);
-					change_two(matrix.j[beginj], matrix.j[beginj + 1]);
-					ok = false;
-				}
-			}
-			if (ok == true)
-				break;
-			ok = true;
-		}
-		change_list();
+		n--;
+		//for (begini = 1; begini < matrix.n; begini++)
+		//{
+		//	for (beginj = begini; beginj < matrix.n; beginj++)
+		//	{
+		//		if (matrix.point[beginj] > matrix.point[beginj + 1])
+		//		{
+		//			change_two(matrix.point[beginj], matrix.point[beginj + 1]);
+		//			for (int num = matrix.nb; num >= matrix.n; num--)
+		//			{
+		//				pp = num - matrix.n + 1;
+		//				change_two(matrix.keyi[pp][beginj], matrix.keyi[pp][beginj + 1]);
+		//				change_two(matrix.keyj[pp][beginj], matrix.keyj[pp][beginj + 1]);
+		//			}
+		//			
+		//			change_two(matrix.i[beginj], matrix.i[beginj + 1]);
+		//			change_two(matrix.j[beginj], matrix.j[beginj + 1]);
+		//			ok = false;
+		//		}
+		//	}
+		//	if (ok == true)
+		//		break;
+		//	ok = true;
+		//}
+		//change_list();
 	}
 
 	return Play(matrix.i[1], matrix.j[1]);
@@ -615,10 +627,10 @@ void init_LIST()
 
 }
 
-void change_list()
+void change_list(int t)
 {
 	int n = matrix.nb - matrix.n + 2;
-	for (int i = 1; i < matrix.n; i++)
+	for (int i = t; i < matrix.n; i++)
 	{
 
 		matrix.point[i] = matrix.point[i + 1];
@@ -636,7 +648,7 @@ void change_list()
 void Get_point(int n,int j)//得到所在行的一个棋子
 {
 	int tool = 0;
-	int i, keyi, keyj, keyp, n_now = matrix.nb - n + 1;
+	int keyi, keyj, keyp, n_now = matrix.nb - n + 1;
 	bool oddOReven;
 	TRAVERSE trav;
 	
@@ -662,9 +674,9 @@ void Get_point(int n,int j)//得到所在行的一个棋子
 		Get_finalpoint(keyi, keyj, keyp, oddOReven);
 		matrix.keyi[n_now][j] = keyi; 
 		matrix.keyj[n_now][j] = keyj;
-		matrix.point[j] += keyp;
+		matrix.point[j] = keyp;
 	}
-	
+	 
 
 }
 
@@ -679,7 +691,7 @@ bool Judge_oddoroven(int n)
 
 void Get_finalpoint(int& keyi,int&keyj,int&keypp,bool minormax)
 {
-	int temp, tempp, keyp, i, j;
+	int tempp, keyp, i, j;
 	if (minormax == 0)keyp = 1000000;
 	else keyp = -1000000;
 	for (i = 1; i <= N; i++)
@@ -695,22 +707,35 @@ void Get_finalpoint(int& keyi,int&keyj,int&keypp,bool minormax)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 1000000)
+			if (tempp == 10000)
 			{
+				if (minormax == 0)keyp = -10000;
+				if (minormax == 1)keyp = 10000;
+				keyi = i;
+				keyj = j;
+				keypp = keyp;
 				p[i][j] = 0;
-				keyp = -1000000;
-				break;
+				return;
 			}
 			p[i][j] = 0;
-			if (-tempp < keyp&&minormax == 0)keyp = -tempp, keyi = i, keyj = j;//第二层取极小
-			if (tempp > keyp&&minormax == 1)keyp = tempp, keyi = i, keyj = j;//第二层取极大
+			if (-tempp < keyp&&minormax == 0)
+			{
+				keyp = -(tempp*4);
+				keyi = i;
+				keyj = j;
+			}//第二层取极小
+			if (tempp > keyp&&minormax == 1)
+			{
+				keyp = tempp, keyi = i, keyj = j;//第二层取极大
+			}
+
 		}
 	}
 	keypp = keyp;
 
 }
 
-void Findpieces1(int n)
+bool Findpieces1(int n)
 {
 	matrix.n = n;
 	matrix.nb = n;
@@ -725,24 +750,35 @@ void Findpieces1(int n)
 				continue;
 			p[i][j] = s0;
 			tempp = point(i, j, 1); //计算这个点的分数
+			temp = tempp;
 			if (tempp == 0)
 			{
 				p[i][j] = 0;
 				continue;
 			}//高效剪枝，避开了无效点
-			if (tempp == 1000000)return Play(i, j);
+			if (tempp == 10000)
+			{
+				Play(i, j); 
+				return true;
+			}
 			old_FROM_new(trav);
 			upgrate_traverse(i, j);
 			tempp = Findpieces2(tempp);
+			if (tempp == -10000) 
+			{
+				return true;
+			}
 			new_FROM_old(trav);
 			p[i][j] = 0;
-			if (tempp > matrix.point[1])
+			if (tempp > keyp)
 			{
 				keyp = tempp , keyi = i, keyj = j;//第一层取极大
-				changeMATRIX(keyi, keyj, keyp);
+				changeMATRIX(keyi, keyj, temp);
 			}
-		}
+		} 
 	}
+	return false;
+
 }
 
 int Findpieces2(int p1)
@@ -761,15 +797,20 @@ int Findpieces2(int p1)
 				p[i][j] = 0;
 				continue;
 			}
-			if (tempp == 1000000)
+			if (tempp == 10000)
 			{
 				p[i][j] = 0;
-				return -1000000;
+				Play(i, j);
+				return -10000;
 			}
-
+			old_FROM_new(trav);
+			upgrate_traverse(i, j);
+			tempp = Findpieces3(tempp);
+			new_FROM_old(trav);
 			p[i][j] = 0;
-			if (tempp + p1 < keyp)keyp = tempp + p1, keyi = i, keyj = j;//第二层取极小
+			if (tempp + p1 < keyp)keyp = tempp + p1;//第二层取极小
 		}
+
 	}
 
 	return keyp;
@@ -777,6 +818,36 @@ int Findpieces2(int p1)
 
 }
 
+int Findpieces3(int p2)
+{
+	int keyp = -100000, tempp, i, j, keyi, keyj;
+	TRAVERSE trav;
+	for (i = 1; i <= N; i++)
+	{
+		for (j = tra.i_beginj[i]; j <= tra.i_endj[i]; j++)
+		{
+			if (!MoveinChessorNot(i, j))continue;
+			p[i][j] = s0;  //转换为对面棋子
+			tempp = point(i, j, 1);
+			if (tempp == 0)
+			{
+				p[i][j] = 0;
+				continue;
+			}
+			if (tempp == 10000)
+			{
+				p[i][j] = 0;
+				return 10000;
+			}
+			p[i][j] = 0;
+			if (tempp - p2 * 3 > keyp)keyp = tempp - p2 * 3;//第三层取极大eyi = i, keyj = j;//第二层取极小
+		}
+	}
+
+	return keyp;
+
+
+}
 void Findfivepieces(int n)
 {
 	five.n = n;
@@ -837,7 +908,7 @@ void changeMATRIX(int i, int j, int point)
 {
 	bool ok = true;
 	int n = matrix.nb - matrix.n + 1;
-	int begini, beginj, mid;
+	int begini, beginj;
 	if (point >= matrix.point[1])
 	{
 		matrix.point[1] = point;
@@ -871,7 +942,7 @@ void changeMATRIX(int i, int j, int point)
 void changeFIVE(int i,int j,int point)
 {
 	bool ok = true;
-	int begini, beginj, mid;
+	int begini, beginj;
 	if(point>=five.point[1])
 	{
 		five.point[1] = point;
@@ -1087,7 +1158,7 @@ void GeginRule()/*开始环节（指定开局黑方第一子为天元，
 
 void ChooseFivepieces2(int n)
 {
-	int tempp, temp, keyp, keyj, score;
+	int score;
 	cout << "对方提供的位置为：";
 	char c = '\n';
 	int row = 0, col = 0;
